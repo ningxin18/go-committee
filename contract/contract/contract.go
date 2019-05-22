@@ -159,3 +159,37 @@ func (crt *Contract) ContractTransaction(node *usedrpc.UseRPC, ks *keystore.KeyS
 	Nonce++
 	return result, err
 }
+
+func SubInheritTransaction(rpc *usedrpc.UseRPC, ks *keystore.KeyStore, coinbase string, to string) (string, error) {
+
+	//input := new(hexutil.Bytes)
+	input := hexutil.ToBytes(big.NewInt(int64(1)).Bytes())
+	coinbaseUM := common.AddressToBase58Address(common.HexToAddress(coinbase)).String()
+
+	nonce, err := rpc.UseGetTransactionCount(coinbaseUM, "pending")
+	if err != nil {
+		log.Error("Get nonce failed", "error", err)
+	}
+
+	if Nonce <= uint64(nonce) {
+		Nonce = uint64(nonce)
+	}
+
+	tx := types.NewSpecialTransaction(9, Nonce, common.HexToAddress(to), nil, 10000000, big.NewInt(20000000000), input)
+	ac, err := account.CommitteeAccount(common.HexToAddress(coinbase), ks)
+
+	if err != nil {
+		fmt.Println("account:", err)
+	}
+
+	// TODO NETWORK id
+	signedTx, err := ks.SignTx(ac, tx, big.NewInt(2))
+	if err != nil {
+		log.Error("Sign the committee Msg failed, Please unlock the verifier account", "err", err)
+		return "", err
+	}
+	txbyte, err := rlp.EncodeToBytes(signedTx)
+	result, err := rpc.UseSendRawTransaction(hexutil.Encode(txbyte))
+	Nonce++
+	return result, err
+}

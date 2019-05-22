@@ -343,6 +343,19 @@ func ConfirmSubAccount(usechain *config.Usechain, sub core.VerifiedSub) error {
 	return nil
 }
 
+func SubInheritTX(usechain *config.Usechain, sub core.VerifiedSub) error {
+	rpc := usechain.NodeRPC
+	coinbase := usechain.UserProfile.Address
+	res, err := contract.SubInheritTransaction(rpc,  usechain.Kstore, coinbase, sub.Haddr)
+	if err != nil {
+		log.Error("VerifySub transaction", "err", err)
+		return err
+	}
+	log.Info("SubInheritTX transaction", "hash", res)
+	return nil
+}
+
+
 func sendPublickeyShared(usechain *config.Usechain, nodelist []string, A string, max int, addrID string) ([]int){
 	priv := sssa.ExtractPrivateShare(usechain.UserProfile.PrivShares)	//bs
 	if priv == nil {

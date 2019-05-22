@@ -51,6 +51,7 @@ type VerifiedMain struct {
 type VerifiedSub struct {
 	RegisterID *big.Int
 	Status  *big.Int
+	Haddr string
 }
 
 type SharePool struct {
@@ -240,6 +241,11 @@ func (self *SharePool) CheckSharedMsg(usechain *config.Usechain, requires int) {
 				log.Error("Decode sub encdata", "err", err)
 			}
 
+			HpubByte, _:=hexutil.Decode(data[0])
+			Hpub := crypto.ToECDSAPub(HpubByte)
+			hAddr := crypto.PubkeyToAddress(*Hpub)
+			HAddr := hexutil.Encode(hAddr[:])
+
 			regiID, err := strconv.Atoi(A)
 			if err != nil {
 				fmt.Println("registerID error", err)
@@ -251,6 +257,7 @@ func (self *SharePool) CheckSharedMsg(usechain *config.Usechain, requires int) {
 				verifiedSub := VerifiedSub{
 					RegisterID: big.NewInt(int64(regiID)),
 					Status: big.NewInt(4),
+					Haddr: HAddr,
 				}
 				self.VerifiedSubChan <- verifiedSub
 			} else {
@@ -262,6 +269,7 @@ func (self *SharePool) CheckSharedMsg(usechain *config.Usechain, requires int) {
 					verifiedSub := VerifiedSub{
 						RegisterID: big.NewInt(int64(regiID)),
 						Status: big.NewInt(4),
+						Haddr: HAddr,
 					}
 					self.VerifiedSubChan <- verifiedSub
 				} else {
@@ -279,6 +287,7 @@ func (self *SharePool) CheckSharedMsg(usechain *config.Usechain, requires int) {
 						verifiedSub := VerifiedSub{
 							RegisterID: big.NewInt(int64(regiID)),
 							Status: big.NewInt(4),
+							Haddr: HAddr,
 						}
 						self.VerifiedSubChan <- verifiedSub
 					}
@@ -289,6 +298,7 @@ func (self *SharePool) CheckSharedMsg(usechain *config.Usechain, requires int) {
 						verifiedSub := VerifiedSub{
 							RegisterID: big.NewInt(int64(regiID)),
 							Status: big.NewInt(4),
+							Haddr: HAddr,
 						}
 						self.VerifiedSubChan <- verifiedSub
 					} else {
@@ -331,9 +341,14 @@ func (self *SharePool) CheckSharedMsg(usechain *config.Usechain, requires int) {
 			if err != nil {
 				log.Error("registerID error", "err", err)
 			}
+			HpubByte, _:=hexutil.Decode(HSverify[0])
+			Hpub := crypto.ToECDSAPub(HpubByte)
+			hAddr := crypto.PubkeyToAddress(*Hpub)
+
 			verifiedSub := VerifiedSub{
 				RegisterID: big.NewInt(int64(regiID)),
 				Status: big.NewInt(status),
+				Haddr: hexutil.Encode(hAddr[:]),
 			}
 			self.VerifiedSubChan <- verifiedSub
 

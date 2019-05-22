@@ -209,6 +209,10 @@ func AccountVerifyProcess(usechain *config.Usechain, pool *core.SharePool) {
 			if err == nil {
 				log.Info("ConfirmSubAccount", "result", "success")
 			}
+			err = creditNew.SubInheritTX(usechain, s)
+			if err == nil {
+				log.Info("SubInheritTX", "result", "success")
+			}
 		}
 	}
 }

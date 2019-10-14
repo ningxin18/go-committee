@@ -48,7 +48,7 @@ func TestSingleShamir(t *testing.T) {
 	fmt.Println("res：", VerifyCreatedAndPolynomial(created, polyPublicKeys))
 }
 
-const shares = 3
+const shares = 5
 
 func TestMultiShamir(t *testing.T) {
 	var creates [][]string = make([][]string, shares)
@@ -65,7 +65,7 @@ func TestMultiShamir(t *testing.T) {
 	for i := 0; i < shares; i++ {
 		tmp = random()
 		fmt.Println("Tmp number:", tmp)
-		creates[i], pointers[i], polynomials[i], err = Create256Bit(2,3, tmp)
+		creates[i], pointers[i], polynomials[i], err = Create256Bit(3,5, tmp)
 		if err != nil {
 			fmt.Println("err", err)
 			return
@@ -159,25 +159,25 @@ func TestClient(t *testing.T) {
 
 const CommitteeKey = "0x04b8f04cc7fdfce5eed37983f43cd5ac8ef7efd56d6e6ed218b3f534d86f2489794d7060d39a583608247016306870abd2b23a808212ba9cfd675f1b0a09b4b02f"
 
-func TestABGenerate(t *testing.T) {
-	mainPriv, err := crypto.GenerateKey()
-	if err != nil {
-		fmt.Println("key generate failed, err:", err)
-		return
-	}
-
-	sPriv, err := crypto.GenerateKey()
-	if err != nil {
-		fmt.Println("key generate failed, err:", err)
-		return
-	}
-
-	B := crypto.ToECDSAPub(common.FromHex(CommitteeKey))
-	_, a1, _, _ :=crypto.GenerteABPrivateKey(mainPriv, sPriv, hexutil.Encode(B.X.Bytes()), hexutil.Encode(B.Y.Bytes()), hexutil.Encode(sPriv.PublicKey.X.Bytes()), hexutil.Encode(sPriv.PublicKey.Y.Bytes()))
-	a2 := generatePrivKey(a1.D)
-
-	fmt.Println("a2", a2)
-}
+//func TestABGenerate(t *testing.T) {
+//	mainPriv, err := crypto.GenerateKey()
+//	if err != nil {
+//		fmt.Println("key generate failed, err:", err)
+//		return
+//	}
+//
+//	sPriv, err := crypto.GenerateKey()
+//	if err != nil {
+//		fmt.Println("key generate failed, err:", err)
+//		return
+//	}
+//
+//	B := crypto.ToECDSAPub(common.FromHex(CommitteeKey))
+//	_, a1, _, _ :=crypto.GenerteABPrivateKey(mainPriv, sPriv, hexutil.Encode(B.X.Bytes()), hexutil.Encode(B.Y.Bytes()), hexutil.Encode(sPriv.PublicKey.X.Bytes()), hexutil.Encode(sPriv.PublicKey.Y.Bytes()))
+//	a2 := generatePrivKey(a1.D)
+//
+//	fmt.Println("a2", a2)
+//}
 
 func TestPubCombine(t *testing.T) {
 	pubs := []string{
@@ -197,9 +197,12 @@ func TestPubCombine(t *testing.T) {
 }
 
 func TestSecretCombine(t *testing.T) {
-	shares := []string{//"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=mZfEnYvTuEejlN5z_4JZz1TyXFOAzq8NEmqsttA_y7Y=",
-		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=cvNINT0A67rlVoAyyfp59syyp8ivwIVKiudR2lDlSms=",
-		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM=TE7LzO4uHy4nGCHxlHKaHkRy8z3esluIA2P2_dGKySA=",
+	shares := []string{
+	"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=wSoLC_rR9JLFnSxPgOfa9HmT89P8JgKONQSIV5vCIkg=",
+		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=wxyb-6LJqoqwN4Q3QPTjmfTbSwvWKtRPw2TmkrhExbc=",
+		"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU=gsCFQ2F3t30HEH2B_CXFMYmm3R2sm3R2frf6YkCePrA=",
+		//"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=CsUVRyqZIdtbHKNxm7rtmPsU7nrXjAcigse7hv9M1Jk=",
+		//"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=dyi65iaJ6syKKrLoriIaR_h1XvRjpeGiBSFzGdt8ku4=",
 	}
 	combined, err := Combine256Bit(shares)
 	if err != nil {
@@ -207,10 +210,67 @@ func TestSecretCombine(t *testing.T) {
 	}
 	fmt.Println("The combined string:", combined)
 
-
 	pub := generatePrivKey(combined).PublicKey
 	fmt.Println(pub)
 	fmt.Printf("%x\n", crypto.FromECDSAPub(&pub))
+}
+
+func TestSecretCombine53(t *testing.T) {
+	//shares := []string{"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=j3y3TCc4ilcP2pU32-mrSgIvyFja6U3415JfXGp11dE=",
+	//	"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=-IygrqFEzTIcRMA1iI-DzJY7TOEa6TuB7-DyGpvGLQc=",
+	//	"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM=hRlMEUs6rb1eHJjZ-G-_GbGCHX2z9Bcyb-RLw54s-3s=",
+	//	//"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=NSK5dCUaK_jVYh8lK4pdMA6zFxVVUoFGF27K5EHggm4=",
+	//	//"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU=CKjo1y7jR-SCFVMXId9eD63OOaf_BHm85oBvfIbgweA=",
+	//}
+	shares, _, _, err := Create256Bit(3,5, big.NewInt(188888888111111111))
+	if err != nil {
+		fmt.Println("err", err)
+		return
+	}
+	fmt.Println(shares)
+	combined, err := Combine256Bit(shares)
+	if err != nil {
+		fmt.Println("Fatal: combining: ", err)
+	}
+	fmt.Println("The combined string", combined)
+
+	//Committee priv key
+	b := GeneratePrivKey(combined)
+	B := b.PublicKey
+	fmt.Println("B", B)
+
+	//Customer priv key
+	aInt, _ := big.NewInt(0).SetString("22221506567349786020842321911135580879999997990408321508701492916562825433333", 10)
+	a := GeneratePrivKey(aInt)
+	A := a.PublicKey
+	fmt.Println("A",  common.ToHex(crypto.FromECDSAPub(&A)))
+
+	//calculate bA
+	A1 := new(ecdsa.PublicKey)
+	A1.Curve = crypto.S256()
+	A1.X, A1.Y = crypto.S256().ScalarMult(A.X, A.Y, b.D.Bytes())   //A1=[b]A
+	fmt.Println("A1", A1)
+
+	var privKeys []*ecdsa.PrivateKey = make([]*ecdsa.PrivateKey, 3)
+	var pubShares []string = make([]string, 3)
+	for i := range shares {
+		if i == 3 {
+			break
+		}
+		privKeys[i] = ExtractPrivateShare(shares[i])	//bs
+
+		//pubkey := new(ecdsa.PublicKey)
+		//pubkey.X, pubkey.Y = crypto.S256().ScalarMult(A.X, A.Y, privKeys[i].D.Bytes())   //bsA=[bs]A
+		//pubkey.Curve = crypto.S256()
+
+		pubShares[i] += utils.ToBase64(big.NewInt(int64(i + 1)))
+		pubShares[i] += utils.ToBase64(privKeys[i].PublicKey.X)
+		pubShares[i] += utils.ToBase64(privKeys[i].PublicKey.Y)
+		fmt.Println(pubShares[i])
+	}
+	//fmt.Println("pubs", pubs)
+	rawPub, _ := CombineECDSAPubkey(pubShares)
+	fmt.Println(rawPub)
 }
 
 func TestSharesKeyCombine(t *testing.T) {
